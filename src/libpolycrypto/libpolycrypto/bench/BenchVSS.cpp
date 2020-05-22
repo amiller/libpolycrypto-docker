@@ -34,7 +34,8 @@ void benchmarkVss(
     const AuthAccumulatorTree* authAccs,
     std::ofstream& fout)
 {
-    Dkg::DkgParams params(f+1, 2*f+1, vssType != "feld");
+    size_t n = 3*f + 1;
+    Dkg::DkgParams params(f+1, n, vssType != "feld");
     testAssertStrictlyGreaterThan(params.n, 1);
 
     std::unique_ptr<Dkg::FeldmanPublicParameters> fpp;
@@ -45,7 +46,7 @@ void benchmarkVss(
 
     std::vector<Dkg::AbstractPlayer*> players;
     
-    loginfo << "Benchmarking " << f + 1 << " out of " << 2*f+1 << " '" << vssType << "' VSS ..." << endl;
+    loginfo << "Benchmarking " << f + 1 << " out of " << n << " '" << vssType << "' VSS ..." << endl;
 
     // we restrict the # of players we allocate to save memory
     size_t numReal = std::min(numDealIters, params.n);
@@ -205,7 +206,7 @@ int main(int argc, char *argv[]) {
     if(argc < 9) {
         cout << "Usage: " << argv[0] << " <public-params-file> <min-f> <max-f> <vss-types> <num-deal-iters> <out-file>" << endl;
         cout << endl;
-        cout << "Simulates the specified VSSs with threshold starting at t = <min-f> + 1 up to t = <max-f> + 1, where n is always 2f+1." << endl;
+        cout << "Simulates the specified VSSs with threshold starting at t = <min-f> + 1 up to t = <max-f> + 1, where n is always 3f+1." << endl;
         cout << endl;
         cout << "OPTIONS: " << endl;
         cout << "   <public-params-file>    the file with q-SDH public params for Kate-based VSS" << endl;
@@ -249,10 +250,11 @@ int main(int argc, char *argv[]) {
     std::vector<size_t> fs;
     loginfo << "Benchmarking thresholds: " << endl;
     size_t maxN = 0, f, maxT = 0;
-    for(size_t p = Utils::smallestPowerOfTwoAbove(minf); p <= maxf + 1; p *= 2) {
+    //for(size_t p = Utils::smallestPowerOfTwoAbove(minf); p <= maxf + 1; p *= 2) {
+    for(size_t p = Utils::smallestPowerOfTwoAbove(minf); p <= maxf + 1; p++) {
         f = p - 1;
         maxT = f + 1;
-        maxN = 2*f + 1;
+        maxN = 3*f + 1;
         loginfo << " * " << maxT << " out of " << maxN << " VSSs" << endl;
         fs.push_back(f);
     }
